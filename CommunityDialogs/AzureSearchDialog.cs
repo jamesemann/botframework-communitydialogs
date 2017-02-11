@@ -34,6 +34,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace CommunityDialogs
 {
@@ -65,7 +66,11 @@ namespace CommunityDialogs
 
         public async Task StartAsync(IDialogContext context)
         {
-            context.Wait(InitMessageReceivedStart);
+            var replyToConversation = context.MakeMessage();
+            replyToConversation.Text = "Please enter your search:";
+
+            await context.PostAsync(replyToConversation);
+            context.Wait(SearchMessageReceivedStart);
         }
 
         public async Task InitMessageReceivedStart(IDialogContext context, IAwaitable<IMessageActivity> argument)
@@ -89,8 +94,8 @@ namespace CommunityDialogs
                 client.DefaultRequestHeaders.Add("api-key", this.azureSearchKey);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                var suffix = this.facets.Count() == 1 ? $"facet={this.facets[0]}" : string.Empty;
-                var response = await client.GetAsync($"docs?api-version=2016-09-01&search={search}&{suffix}");
+                var suffix = this.facets.Count() == 1 ? $"facet={HttpUtility.UrlEncode(this.facets[0])}" : string.Empty;
+                var response = await client.GetAsync($"docs?api-version=2016-09-01&search={HttpUtility.UrlEncode(search)}&{suffix}");
                 if (response.IsSuccessStatusCode)
                 {
                     var responseJson = await response.Content.ReadAsStringAsync();
@@ -145,7 +150,7 @@ namespace CommunityDialogs
                         }
 
                         await context.PostAsync(replyToConversation);
-                        context.Wait(InitMessageReceivedStart);
+                        context.Done<object>(new object());
                     }
                 }
             }
@@ -165,7 +170,7 @@ namespace CommunityDialogs
 
                 var suffix = this.facets.Count() == 1 ? $"facet={this.facets[0]}" : string.Empty;
                 
-                var response = await client.GetAsync($"docs?api-version=2016-09-01&search={this.search}&filter={this.facets[0]}%20eq%20'{this.facet}'");
+                var response = await client.GetAsync($"docs?api-version=2016-09-01&search={HttpUtility.UrlEncode(this.search)}&$filter={this.facets[0]}%20eq%20'{HttpUtility.UrlEncode(this.facet)}'");
                 if (response.IsSuccessStatusCode)
                 {
                     var responseJson = await response.Content.ReadAsStringAsync();
@@ -183,7 +188,7 @@ namespace CommunityDialogs
                     await context.PostAsync(replyToConversation);
                 }
             }
-            context.Wait(InitMessageReceivedStart);
+            context.Done<object>(new object());
         }
     }
 }
