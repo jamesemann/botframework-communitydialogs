@@ -66,11 +66,21 @@ namespace CommunityDialogs
 
         public async Task StartAsync(IDialogContext context)
         {
-            var replyToConversation = context.MakeMessage();
-            replyToConversation.Text = "Please enter your search:";
+            var parentDialog = context.Frames[1].Target;
+            bool initiatingDialog = parentDialog.GetType().Name == "LoopDialog`1";
 
-            await context.PostAsync(replyToConversation);
-            context.Wait(SearchMessageReceivedStart);
+            if (initiatingDialog)
+            {
+                context.Wait(InitMessageReceivedStart);
+            }
+            else
+            {
+                var replyToConversation = context.MakeMessage();
+                replyToConversation.Text = "Please enter your search:";
+
+                await context.PostAsync(replyToConversation);
+                context.Wait(SearchMessageReceivedStart);
+            }
         }
 
         public async Task InitMessageReceivedStart(IDialogContext context, IAwaitable<IMessageActivity> argument)
