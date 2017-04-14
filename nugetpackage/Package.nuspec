@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>CommunityDialogs</id>
-    <version>0.5</version>
+    <version>0.6</version>
     <authors>James Mann</authors>
     <owners>James Mann</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Dialogs for Bot Framework Bots.</description>
-    <tags>Bot Framework</tags>    
+    <tags>Bot Framework</tags>
     <dependencies>
-	<dependency id="Microsoft.Bot.Builder" version="3.0.0.0"></dependency>
-	    </dependencies>
+      <dependency id="Microsoft.Bot.Builder" version="3.5.5"></dependency>
+    </dependencies>
   </metadata>
 </package>
