@@ -26,6 +26,7 @@
 //
 
 using CommunityDialogs.Client.Examples.AzureSearchDialog;
+using CommunityDialogs.Client.Examples.FacebookAccountLinkingDialog;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
 using System;
@@ -45,8 +46,6 @@ namespace CommunityDialogs.Client.Controllers
         {
             var message = await argument;
             // add card here
-
-
             var replyToConversation = context.MakeMessage();
             replyToConversation.Text = "Pick a dialog to test:";
             replyToConversation.Recipient = message.From;
@@ -54,13 +53,19 @@ namespace CommunityDialogs.Client.Controllers
             replyToConversation.Attachments = new List<Attachment>();
             List<CardAction> cardButtons = new List<CardAction>();
 
-            CardAction plButton = new CardAction()
+            cardButtons.Add(new CardAction()
             {
                 Value = $"azuresearch",
                 Type = "imBack",
                 Title = $"AzureSearchDialog"
-            };
-            cardButtons.Add(plButton);
+            });
+
+            cardButtons.Add(new CardAction()
+            {
+                Value = $"FacebookAccountLinkingDialog",
+                Type = "imBack",
+                Title = $"FacebookAccountLinkingDialog"
+            });
 
             HeroCard plCard = new HeroCard()
             {
@@ -80,6 +85,10 @@ namespace CommunityDialogs.Client.Controllers
             if (message.Text.ToLower().Equals("azuresearch", StringComparison.InvariantCultureIgnoreCase))
             {
                 context.Call<object>(new MyAzureSearchDialog(), AfterChildDialogIsDone);
+            }
+            else if (message.Text.ToLower().Equals("facebookaccountlinkingdialog", StringComparison.InvariantCultureIgnoreCase))
+            {
+                context.Call<object>(new MyFacebookAccountLinkingDialog(), AfterChildDialogIsDone);
             }
             else
             {
